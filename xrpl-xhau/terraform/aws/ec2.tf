@@ -60,37 +60,6 @@ resource "aws_iam_instance_profile" "validator" {
 }
 
 # ============================================================================
-# Bastion Host
-# ============================================================================
-
-resource "aws_instance" "bastion" {
-  ami           = data.aws_ami.ubuntu.id
-  instance_type = var.bastion_instance_type
-  key_name      = aws_key_pair.validator.key_name
-  subnet_id     = aws_subnet.public[0].id
-
-  vpc_security_group_ids = [aws_security_group.bastion.id]
-
-  root_block_device {
-    volume_type = "gp3"
-    volume_size = 20
-    encrypted   = true
-  }
-
-  user_data = <<-EOF
-    #!/bin/bash
-    apt-get update
-    apt-get install -y htop vim tmux
-    echo "Bastion host ready" > /var/log/bastion-ready.log
-  EOF
-
-  tags = {
-    Name = "${var.project_name}-${var.environment}-bastion"
-    Role = "bastion"
-  }
-}
-
-# ============================================================================
 # Validator Node
 # ============================================================================
 

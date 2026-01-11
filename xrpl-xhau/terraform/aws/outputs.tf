@@ -26,15 +26,6 @@ output "private_subnet_ids" {
 # EC2 Outputs
 # ============================================================================
 
-output "bastion_public_ip" {
-  description = "Public IP of the bastion host"
-  value       = aws_instance.bastion.public_ip
-}
-
-output "bastion_public_dns" {
-  description = "Public DNS of the bastion host"
-  value       = aws_instance.bastion.public_dns
-}
 
 output "validator_private_ips" {
   description = "Private IPs of validator nodes"
@@ -55,10 +46,6 @@ output "monitoring_private_ip" {
 # Security Group Outputs
 # ============================================================================
 
-output "bastion_security_group_id" {
-  description = "Security group ID for bastion host"
-  value       = aws_security_group.bastion.id
-}
 
 output "validator_security_group_id" {
   description = "Security group ID for validator nodes"
@@ -84,12 +71,7 @@ output "validator_keys_secret_arn" {
 # SSH Connection Commands
 # ============================================================================
 
-output "ssh_bastion_command" {
-  description = "SSH command to connect to bastion host"
-  value       = "ssh -i your-key.pem ubuntu@${aws_instance.bastion.public_ip}"
-}
-
 output "ssh_validator_command" {
-  description = "SSH command to connect to validator through bastion"
-  value       = "ssh -i your-key.pem -o ProxyCommand='ssh -i your-key.pem -W %h:%p ubuntu@${aws_instance.bastion.public_ip}' ubuntu@${aws_instance.validator[0].private_ip}"
+  description = "SSH command to connect to validator"
+  value       = "ssh -i your-key.pem ubuntu@${aws_instance.validator[0].private_ip}"
 }

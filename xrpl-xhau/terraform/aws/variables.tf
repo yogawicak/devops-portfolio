@@ -63,11 +63,6 @@ variable "monitoring_instance_type" {
   default     = "t3.medium"
 }
 
-variable "bastion_instance_type" {
-  description = "EC2 instance type for bastion host"
-  type        = string
-  default     = "t3.micro"
-}
 
 variable "ssh_public_key" {
   description = "SSH public key for EC2 access"
@@ -76,7 +71,7 @@ variable "ssh_public_key" {
 }
 
 variable "allowed_ssh_cidrs" {
-  description = "CIDR blocks allowed for SSH access to bastion"
+  description = "CIDR blocks allowed for SSH access to instances"
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }

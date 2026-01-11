@@ -1,5 +1,4 @@
 # ============================================================================
-# Note: No bastion host needed for DigitalOcean
 # All droplets have public IPs - use firewall rules to control SSH access
 # ============================================================================
 

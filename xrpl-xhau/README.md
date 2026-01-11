@@ -17,10 +17,10 @@ A production-ready DevOps infrastructure for running XRPL/Xahau validator nodes 
 │  VPC (10.0.0.0/16)                                                      │
 │  ┌────────────────────────────────────────────────────────────────────┐ │
 │  │  Public Subnet (10.0.1.0/24)                                       │ │
-│  │  ┌─────────────────────┐  ┌─────────────────────┐                  │ │
-│  │  │   Bastion Host      │  │   NAT Gateway       │                  │ │
-│  │  │   (t3.micro)        │  │                     │                  │ │
-│  │  └─────────────────────┘  └─────────────────────┘                  │ │
+│  │  ┌─────────────────────┐                                            │ │
+│  │  │   NAT Gateway       │                                            │ │
+│  │  │                     │                                            │ │
+│  │  └─────────────────────┘                                            │ │
 │  └────────────────────────────────────────────────────────────────────┘ │
 │  ┌────────────────────────────────────────────────────────────────────┐ │
 │  │  Private Subnet (10.0.2.0/24)                                      │ │
@@ -39,7 +39,7 @@ A production-ready DevOps infrastructure for running XRPL/Xahau validator nodes 
 │  │  └─────────────────────────────────────────────────────────────┘   │ │
 │  └────────────────────────────────────────────────────────────────────┘ │
 │  ┌────────────────────────────────────────────────────────────────────┐ │
-│  │  Monitoring Subnet (10.0.3.0/24)                                   │ │
+│  │  Private Subnet (10.0.3.0/24)                                      │ │
 │  │  ┌─────────────────────────────────────────────────────────────┐   │ │
 │  │  │            Monitoring Stack (t3.medium)                     │   │ │
 │  │  │  ┌───────────────┐ ┌───────────────┐ ┌──────────────────┐   │   │ │
@@ -132,20 +132,20 @@ docker-compose up -d
 
 ### XRPL Ports
 
-| Port  | Protocol | Purpose                    |
-|-------|----------|----------------------------|
-| 51235 | TCP/UDP  | Peer-to-peer protocol      |
-| 6006  | TCP      | Admin RPC (local only)     |
-| 5005  | TCP      | Public RPC (optional)      |
-| 6007  | TCP      | Admin WebSocket            |
+| Port  | Protocol | Purpose                |
+| ----- | -------- | ---------------------- |
+| 51235 | TCP/UDP  | Peer-to-peer protocol  |
+| 6006  | TCP      | Admin RPC (local only) |
+| 5005  | TCP      | Public RPC (optional)  |
+| 6007  | TCP      | Admin WebSocket        |
 
 ### Environment Variables
 
-| Variable           | Description                  | Default      |
-|--------------------|------------------------------|--------------|
-| `NETWORK_ID`       | Network identifier           | `1`          |
-| `VALIDATOR_TOKEN`  | Validator token (from keys)  | Required     |
-| `UNL_URL`          | UNL publisher URL            | Mainnet UNL  |
+| Variable          | Description                 | Default     |
+| ----------------- | --------------------------- | ----------- |
+| `NETWORK_ID`      | Network identifier          | `1`         |
+| `VALIDATOR_TOKEN` | Validator token (from keys) | Required    |
+| `UNL_URL`         | UNL publisher URL           | Mainnet UNL |
 
 ## 📊 Monitoring
 
@@ -158,21 +158,20 @@ docker-compose up -d
 
 ### Alerting Rules
 
-| Alert                    | Condition                        | Severity |
-|--------------------------|----------------------------------|----------|
-| `ValidatorOffline`       | Node unreachable > 2min          | Critical |
-| `ConsensusFailure`       | Not participating in consensus   | Critical |
-| `HighCPUUsage`           | CPU > 80% for 5min               | Warning  |
-| `DiskSpaceLow`           | Disk usage > 85%                 | Warning  |
-| `PeerCountLow`           | Connected peers < 10             | Warning  |
+| Alert              | Condition                      | Severity |
+| ------------------ | ------------------------------ | -------- |
+| `ValidatorOffline` | Node unreachable > 2min        | Critical |
+| `ConsensusFailure` | Not participating in consensus | Critical |
+| `HighCPUUsage`     | CPU > 80% for 5min             | Warning  |
+| `DiskSpaceLow`     | Disk usage > 85%               | Warning  |
+| `PeerCountLow`     | Connected peers < 10           | Warning  |
 
 ## 🔒 Security Best Practices
 
 1. **Network Isolation**: Validators run in private subnets
 2. **Minimal Exposure**: Only peer port (51235) exposed to public
 3. **Key Management**: Validator keys stored in AWS Secrets Manager
-4. **Bastion Host**: SSH access only through bastion
-5. **Firewall Rules**: Strict security group configurations
+4. **Firewall Rules**: Strict security group configurations
 
 ## 📚 Documentation
 

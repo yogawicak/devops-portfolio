@@ -1,34 +1,4 @@
 # ============================================================================
-# Bastion Host Security Group
-# ============================================================================
-
-resource "aws_security_group" "bastion" {
-  name        = "${var.project_name}-${var.environment}-bastion-sg"
-  description = "Security group for bastion host"
-  vpc_id      = aws_vpc.main.id
-
-  ingress {
-    description = "SSH from allowed CIDRs"
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = var.allowed_ssh_cidrs
-  }
-
-  egress {
-    description = "Allow all outbound traffic"
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
-  }
-
-  tags = {
-    Name = "${var.project_name}-${var.environment}-bastion-sg"
-  }
-}
-
-# ============================================================================
 # Validator Security Group
 # ============================================================================
 
@@ -37,13 +7,13 @@ resource "aws_security_group" "validator" {
   description = "Security group for XRPL/Xahau validator nodes"
   vpc_id      = aws_vpc.main.id
 
-  # SSH from bastion only
+  # SSH from allowed CIDRs
   ingress {
-    description     = "SSH from bastion"
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    security_groups = [aws_security_group.bastion.id]
+    description = "SSH from allowed CIDRs"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = var.allowed_ssh_cidrs
   }
 
   # XRPL Peer Protocol (public for peer discovery)
@@ -112,13 +82,13 @@ resource "aws_security_group" "monitoring" {
   description = "Security group for monitoring stack"
   vpc_id      = aws_vpc.main.id
 
-  # SSH from bastion only
+  # SSH from allowed CIDRs
   ingress {
-    description     = "SSH from bastion"
-    from_port       = 22
-    to_port         = 22
-    protocol        = "tcp"
-    security_groups = [aws_security_group.bastion.id]
+    description = "SSH from allowed CIDRs"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = var.allowed_ssh_cidrs
   }
 
   # Grafana (from VPC for now, can be exposed via ALB later)

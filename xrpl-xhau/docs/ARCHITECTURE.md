@@ -9,18 +9,18 @@
 │  VPC (10.0.0.0/16)                                              │
 │  ┌────────────────────────────────────────────────────────────┐ │
 │  │  Public Subnet                    Private Subnet           │ │
-│  │  ┌─────────┐ ┌─────────┐         ┌───────────────────┐     │ │
-│  │  │ Bastion │ │   NAT   │         │ Validator Node    │     │ │
-│  │  │  Host   │ │ Gateway │◄───────►│ - rippled/xahaud  │     │ │
-│  │  └─────────┘ └─────────┘         │ - Node Exporter   │     │ │
-│  │                                  │ - Promtail        │     │ │
-│  │                                  └───────────────────┘     │ │
-│  │                                  ┌───────────────────┐     │ │
-│  │                                  │ Monitoring Stack  │     │ │
-│  │                                  │ - Prometheus      │     │ │
-│  │                                  │ - Grafana         │     │ │
-│  │                                  │ - Loki            │     │ │
-│  │                                  └───────────────────┘     │ │
+│  │  ┌─────────┐                      ┌───────────────────┐     │ │
+│  │  │   NAT   │                      │ Validator Node    │     │ │
+│  │  │ Gateway │◄────────────────────►│ - rippled/xahaud  │     │ │
+│  │  └─────────┘                      │ - Node Exporter   │     │ │
+│  │                                   │ - Promtail        │     │ │
+│  │                                   └───────────────────┘     │ │
+│  │                                   ┌───────────────────┐     │ │
+│  │                                   │ Monitoring Stack  │     │ │
+│  │                                   │ - Prometheus      │     │ │
+│  │                                   │ - Grafana         │     │ │
+│  │                                   │ - Loki            │     │ │
+│  │                                   └───────────────────┘     │ │
 │  └────────────────────────────────────────────────────────────┘ │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -28,19 +28,22 @@
 ## Components
 
 ### Validator Node
+
 - **rippled/xahaud**: XRPL validator software
 - **Node Exporter**: System metrics
 - **Promtail**: Log shipping to Loki
 
 ### Monitoring Stack
+
 - **Prometheus**: Metrics storage and alerting
 - **Grafana**: Dashboards and visualization
 - **Loki**: Log aggregation
 - **Alertmanager**: Alert routing
 
 ### Security
+
 - Private subnet for validators
-- Bastion host for SSH access
+- SSH access controlled by security groups with allowed CIDR restrictions
 - Security groups with minimal exposure
 - Only port 51235 exposed publicly
 

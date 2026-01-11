@@ -74,7 +74,6 @@ terraform apply -var-file="production.tfvars" -var="do_token=$DIGITALOCEAN_TOKEN
 
 After deployment, both configurations output:
 
-- Bastion public IP
 - Validator private IPs
 - SSH connection commands
 - Resource IDs

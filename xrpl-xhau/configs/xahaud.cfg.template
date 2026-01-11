@@ -1,0 +1,146 @@
+# =============================================================================
+# Xahau (xahaud) Configuration
+# =============================================================================
+# This configuration is for running a xahaud validator on Xahau network.
+# Xahau is an XRPL-based sidechain with Hooks support.
+
+# =============================================================================
+# Server Ports
+# =============================================================================
+
+[server]
+port_rpc_admin_local
+port_peer
+port_ws_admin_local
+
+[port_rpc_admin_local]
+port = 6006
+ip = 0.0.0.0
+admin = 127.0.0.1
+protocol = http
+
+[port_peer]
+port = 51235
+ip = 0.0.0.0
+protocol = peer
+
+[port_ws_admin_local]
+port = 6007
+ip = 0.0.0.0
+admin = 127.0.0.1
+protocol = ws
+
+# =============================================================================
+# Node Configuration
+# =============================================================================
+
+[node_size]
+medium
+
+# =============================================================================
+# Database Configuration
+# =============================================================================
+
+[node_db]
+type=NuDB
+path=/var/lib/xahaud/db/nudb
+online_delete=512
+advisory_delete=0
+
+[database_path]
+/var/lib/xahaud/db
+
+# =============================================================================
+# Logging
+# =============================================================================
+
+[debug_logfile]
+/var/log/xahaud/debug.log
+
+[rpc_startup]
+{ "command": "log_level", "severity": "warning" }
+
+# =============================================================================
+# Network Time Protocol
+# =============================================================================
+
+[sntp_servers]
+time.google.com
+time.aws.com
+time.cloudflare.com
+
+# =============================================================================
+# Validator Configuration
+# =============================================================================
+
+# Your validator token
+# [validator_token]
+# VALIDATOR_TOKEN_GOES_HERE
+
+[validators_file]
+validators-xahau.txt
+
+# =============================================================================
+# Xahau Network Settings
+# =============================================================================
+
+# Xahau Mainnet network ID
+[network_id]
+21337
+
+# Xahau Testnet network ID (uncomment for testnet)
+# [network_id]
+# 21338
+
+# Known Xahau peers
+[ips]
+xahau.network 51235
+
+# =============================================================================
+# Xahau-Specific Features
+# =============================================================================
+
+# Enable Hooks V1
+[features]
+HooksV1
+
+# Xahau amendments
+[amendments]
+HooksV1 true
+
+# Hook execution limits
+[hooks]
+# Maximum hook execution time in milliseconds
+max_execution_time = 10000
+# Maximum hook memory in bytes
+max_memory = 2097152
+# Maximum number of emitted transactions per hook
+max_emit = 10
+
+# =============================================================================
+# Performance Tuning
+# =============================================================================
+
+[peer_private]
+0
+
+[ssl_verify]
+1
+
+[transaction_queue]
+minimum_txn_in_ledger_standalone = 1
+minimum_last_ledger_buffer = 2
+zero_basefee_transaction_feelevel = 256000
+
+[ledger_history]
+full
+
+[fetch_depth]
+full
+
+# =============================================================================
+# Voting
+# =============================================================================
+
+[voting]
+# Fee settings are network-specific

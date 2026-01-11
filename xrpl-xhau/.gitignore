@@ -1,0 +1,38 @@
+# Terraform
+*.tfstate
+*.tfstate.backup
+*.tfplan
+production.tfvars
+.terraform/
+.terraform.lock.hcl
+
+# Sensitive files / secrets
+*.pem
+*.key
+*.crt
+*.env
+
+# IDE / editor files
+.idea/
+.vscode/
+*.swp
+*~
+.DS_Store
+
+# Logs and temporary files
+*.log
+tmp/
+
+# Docker
+docker-compose.override.yml
+
+# Generated documentation / build artifacts
+docs/_site/
+build/
+
+# Miscellaneous
+*.bak
+*.tmp
+
+task.md
+task.png

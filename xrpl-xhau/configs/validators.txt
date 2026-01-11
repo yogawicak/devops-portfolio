@@ -1,0 +1,62 @@
+# =============================================================================
+# XRPL Validators List (UNL)
+# =============================================================================
+# This file specifies which UNL (Unique Node List) to use for consensus.
+# The UNL determines which validators your node trusts for consensus.
+
+# =============================================================================
+# UNL Publisher Sites
+# =============================================================================
+# These are the URLs where your node will fetch the validator list.
+# Use the official XRPL Foundation UNL for mainnet.
+
+[validator_list_sites]
+https://vl.xrplf.org
+
+# For Xahau network:
+# https://vl.xahau.org
+
+# For testnet:
+# https://vl.altnet.rippletest.net
+
+# =============================================================================
+# UNL Publisher Keys
+# =============================================================================
+# These are the public keys that sign the validator lists.
+# Your node will only trust lists signed by these keys.
+
+[validator_list_keys]
+# XRPL Foundation key (mainnet)
+ED2677ABFFD1B33AC6FBC3062B71F1E8397C1505E1C42C64D11AD1B28FF73F4734
+
+# Ripple key (mainnet, additional)
+# ED264807102805220DA0F312E71FC2C69E1552C9C5790F6C25E3729DEB573D5860
+
+# =============================================================================
+# Static Validator List (Optional)
+# =============================================================================
+# You can also specify trusted validators directly here.
+# These are treated as "always trusted" regardless of UNL.
+
+# [validators]
+# nHUFE9prPXPrHcG3SkwP1UzAQbSphqyQkQK9ATXLZsfkezhhda3p Ripple1
+# nHBtBkHGfL4NpB54H1AwBaaSJkSJLUSPvnUKAHq6A7iaV2iPWDhZ Ripple2
+# nHUpcmNsxAw47zt2v45vPo7DGR7w9YMEtQb4grqkPkLQ9ZToTRTA Ripple3
+
+# =============================================================================
+# Notes on UNL Configuration
+# =============================================================================
+# 
+# 1. QUORUM: The network requires a supermajority (80%) of trusted validators
+#    to agree on ledger state for consensus.
+#
+# 2. UNL OVERLAP: For network safety, all validators should have significant
+#    overlap (90%+) in their UNLs.
+#
+# 3. CUSTOM UNL: If running a private testnet, you can create your own UNL
+#    by using the validator-keys tool to sign a validator list.
+#
+# 4. DYNAMIC UPDATE: The node will periodically fetch updated lists from
+#    the validator_list_sites to ensure it has the latest trusted validators.
+#
+# =============================================================================

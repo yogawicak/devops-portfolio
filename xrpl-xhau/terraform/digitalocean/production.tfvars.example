@@ -1,0 +1,44 @@
+# Production environment configuration for DigitalOcean
+# Copy this file to production.tfvars and customize
+
+project_name = "xrpl-validator"
+environment  = "testnet"
+do_region    = "nyc3"
+
+# DigitalOcean API Token (set via environment variable or here)
+# do_token = "dop_v1_xxx..."
+
+# Network Configuration
+vpc_cidr = "10.10.0.0/16"
+
+# Droplet Sizes
+# Memory-optimized droplets for validators:
+# m-2vcpu-16gb: 2 vCPU, 16 GB RAM
+# m-4vcpu-32gb: 4 vCPU, 32 GB RAM (recommended)
+# m-8vcpu-64gb: 8 vCPU, 64 GB RAM
+validator_size  = "m-4vcpu-32gb"
+monitoring_size = "s-2vcpu-4gb"
+bastion_size    = "s-1vcpu-1gb"
+
+# SSH Access
+# Replace with your SSH public key
+ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC... your-key"
+
+# Restrict SSH access to your IP only
+allowed_ssh_cidrs = ["YOUR_IP/32"]
+
+# Storage
+ledger_volume_size = 500
+
+# XRPL Configuration
+network_type    = "testnet"
+validator_count = 1
+unl_url         = "https://vl.xrplf.org"
+
+# Monitoring
+enable_monitoring      = true
+grafana_admin_password = "changeme-use-strong-password!"
+alert_email            = "alerts@yourdomain.com"
+
+# Additional Tags
+additional_tags = ["devops", "xrpl"]

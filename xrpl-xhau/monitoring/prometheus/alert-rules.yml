@@ -1,0 +1,207 @@
+# Prometheus Alert Rules for XRPL/Xahau Validators
+
+groups:
+  # ===========================================================================
+  # Validator Health Alerts
+  # ===========================================================================
+  - name: validator_health
+    rules:
+      # Validator node is down
+      - alert: ValidatorDown
+        expr: up{job="xrpl-exporter"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "XRPL Validator is down"
+          description: "Validator {{ $labels.instance }} has been unreachable for more than 2 minutes."
+
+      # Validator not in healthy state
+      - alert: ValidatorUnhealthy
+        expr: xrpl_server_state != 1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Validator not in healthy state"
+          description: "Validator {{ $labels.instance }} is not in 'full', 'proposing', or 'validating' state."
+
+      # Validator not participating in consensus
+      - alert: ConsensusNotParticipating
+        expr: xrpl_consensus_proposing == 0 and xrpl_is_validator == 1
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Validator not participating in consensus"
+          description: "Validator {{ $labels.instance }} is not proposing in consensus for over 10 minutes."
+
+      # Low peer count
+      - alert: LowPeerCount
+        expr: xrpl_peers_connected < 10
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low peer connections"
+          description: "Validator {{ $labels.instance }} has only {{ $value }} peers connected."
+
+      # Very low peer count
+      - alert: CriticallyLowPeerCount
+        expr: xrpl_peers_connected < 5
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critically low peer connections"
+          description: "Validator {{ $labels.instance }} has only {{ $value }} peers. Network connectivity may be compromised."
+
+  # ===========================================================================
+  # Ledger Sync Alerts
+  # ===========================================================================
+  - name: ledger_sync
+    rules:
+      # Ledger not advancing
+      - alert: LedgerStalled
+        expr: increase(xrpl_ledger_seq[5m]) == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Ledger not advancing"
+          description: "Validator {{ $labels.instance }} ledger has not advanced in 5 minutes."
+
+      # Ledger behind network
+      - alert: LedgerBehind
+        expr: xrpl_ledger_age > 60
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Ledger behind network"
+          description: "Validator {{ $labels.instance }} ledger is {{ $value }}s behind the network."
+
+      # Ledger severely behind
+      - alert: LedgerSeverelyBehind
+        expr: xrpl_ledger_age > 300
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Ledger severely behind network"
+          description: "Validator {{ $labels.instance }} ledger is {{ $value }}s behind. Immediate attention required."
+
+  # ===========================================================================
+  # Resource Alerts
+  # ===========================================================================
+  - name: resources
+    rules:
+      # High CPU usage
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+          description: "Host {{ $labels.instance }} CPU usage is above 80% (current: {{ $value | printf \"%.1f\" }}%)"
+
+      # Critical CPU usage
+      - alert: CriticalCPUUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 95
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical CPU usage"
+          description: "Host {{ $labels.instance }} CPU usage is above 95%"
+
+      # High memory usage
+      - alert: HighMemoryUsage
+        expr: (1 - (node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Host {{ $labels.instance }} memory usage is above 85% (current: {{ $value | printf \"%.1f\" }}%)"
+
+      # Low disk space
+      - alert: LowDiskSpace
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 < 15
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low disk space"
+          description: "Host {{ $labels.instance }} has less than 15% disk space remaining."
+
+      # Critical disk space
+      - alert: CriticalDiskSpace
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) * 100 < 5
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical disk space"
+          description: "Host {{ $labels.instance }} has less than 5% disk space remaining. Immediate action required."
+
+      # Disk I/O high
+      - alert: HighDiskIO
+        expr: rate(node_disk_io_time_seconds_total[5m]) > 0.9
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High disk I/O utilization"
+          description: "Host {{ $labels.instance }} disk I/O is saturated."
+
+  # ===========================================================================
+  # Network Alerts
+  # ===========================================================================
+  - name: network
+    rules:
+      # High network receive traffic
+      - alert: HighNetworkReceive
+        expr: rate(node_network_receive_bytes_total{device!="lo"}[5m]) > 100000000
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High network receive traffic"
+          description: "Host {{ $labels.instance }} receiving > 100MB/s"
+
+      # Network interface down
+      - alert: NetworkInterfaceDown
+        expr: node_network_up{device!="lo"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Network interface down"
+          description: "Network interface {{ $labels.device }} on {{ $labels.instance }} is down."
+
+  # ===========================================================================
+  # UNL and Quorum Alerts
+  # ===========================================================================
+  - name: unl_quorum
+    rules:
+      # UNL quorum not met
+      - alert: QuorumNotMet
+        expr: xrpl_unl_quorum_met == 0
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "UNL quorum not met"
+          description: "Validator {{ $labels.instance }} cannot reach quorum with trusted validators."
+
+      # Low UNL validator count
+      - alert: LowUNLValidators
+        expr: xrpl_unl_validators_available < (xrpl_unl_validators_total * 0.8)
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low UNL validator availability"
+          description: "Less than 80% of UNL validators are reachable from {{ $labels.instance }}."

@@ -1,0 +1,168 @@
+# =============================================================================
+# XRPL/Xahau rippled Configuration (Testnet)
+# =============================================================================
+# This configuration is for running a rippled validator on testnet.
+# For mainnet or Xahau, adjust the network settings accordingly.
+
+# =============================================================================
+# Server Ports
+# =============================================================================
+
+[server]
+port_rpc_admin_local
+port_peer
+port_ws_admin_local
+# port_ws_public  # Uncomment for public WebSocket
+
+[port_rpc_admin_local]
+port = 6006
+ip = 0.0.0.0
+admin = 127.0.0.1
+protocol = http
+
+[port_peer]
+port = 51235
+ip = 0.0.0.0
+protocol = peer
+
+[port_ws_admin_local]
+port = 6007
+ip = 0.0.0.0
+admin = 127.0.0.1
+protocol = ws
+
+# Uncomment for public WebSocket access
+# [port_ws_public]
+# port = 6005
+# ip = 0.0.0.0
+# protocol = wss
+# secure_gateway = 127.0.0.1
+
+# =============================================================================
+# Node Configuration
+# =============================================================================
+
+# Node size affects memory usage:
+# tiny: ~8GB RAM
+# small: ~16GB RAM
+# medium: ~32GB RAM (recommended for validators)
+# large: ~64GB RAM
+# huge: ~128GB+ RAM
+
+[node_size]
+medium
+
+# =============================================================================
+# Database Configuration
+# =============================================================================
+
+[node_db]
+type=NuDB
+path=/var/lib/rippled/db/nudb
+# Keep 512 ledgers online (about 30 minutes of history)
+online_delete=512
+advisory_delete=0
+
+[database_path]
+/var/lib/rippled/db
+
+# =============================================================================
+# Logging
+# =============================================================================
+
+[debug_logfile]
+/var/log/rippled/debug.log
+
+# Startup log level - set to "warning" for production
+[rpc_startup]
+{ "command": "log_level", "severity": "warning" }
+
+# =============================================================================
+# Network Time Protocol
+# =============================================================================
+
+[sntp_servers]
+time.google.com
+time.aws.com
+time.cloudflare.com
+pool.ntp.org
+
+# =============================================================================
+# Validator Configuration
+# =============================================================================
+
+# Your validator token (generated from validator-keys tool)
+# [validator_token]
+# VALIDATOR_TOKEN_GOES_HERE
+
+# UNL - Unique Node List
+[validators_file]
+validators.txt
+
+# =============================================================================
+# Network Settings
+# =============================================================================
+
+# Testnet configuration
+[network_id]
+1
+
+# Peer connections
+[ips]
+s.altnet.rippletest.net 51235
+
+# Known testnet peers (add more for better connectivity)
+[ips_fixed]
+# Add trusted peer IPs here
+# 10.0.0.5 51235
+
+# =============================================================================
+# Performance Tuning
+# =============================================================================
+
+# Do not reveal private keys on this server
+[peer_private]
+0
+
+# SSL verification
+[ssl_verify]
+1
+
+# Transaction queue settings
+[transaction_queue]
+minimum_txn_in_ledger_standalone = 1
+minimum_last_ledger_buffer = 2
+zero_basefee_transaction_feelevel = 256000
+
+# Ledger history settings
+[ledger_history]
+full
+
+# Fetch full history (set to 256 for validators)
+[fetch_depth]
+full
+
+# =============================================================================
+# Voting (for validators)
+# =============================================================================
+
+# Amendment voting - validators can vote on new features
+[voting]
+# account_reserve = 10000000
+# owner_reserve = 2000000
+
+# =============================================================================
+# Cluster Configuration (for multi-node setups)
+# =============================================================================
+
+# [cluster_nodes]
+# Validator_1_PUBLIC_KEY_HERE Name1
+# Validator_2_PUBLIC_KEY_HERE Name2
+
+# =============================================================================
+# Insights (optional)
+# =============================================================================
+
+# [insight]
+# server = ws://127.0.0.1:5005
+# collect = true

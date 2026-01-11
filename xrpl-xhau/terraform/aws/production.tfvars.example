@@ -1,0 +1,48 @@
+# Production environment configuration
+# Copy this file to production.tfvars and customize
+
+project_name = "xrpl-validator"
+environment  = "testnet"
+aws_region   = "us-east-1"
+
+# Network Configuration
+vpc_cidr             = "10.0.0.0/16"
+public_subnet_cidrs  = ["10.0.1.0/24", "10.0.2.0/24"]
+private_subnet_cidrs = ["10.0.10.0/24", "10.0.11.0/24"]
+
+# Instance Types
+# r5.large: 2 vCPU, 16 GB RAM - Good for validators
+# r5.xlarge: 4 vCPU, 32 GB RAM - Better for high traffic
+validator_instance_type  = "r5.large"
+monitoring_instance_type = "t3.medium"
+bastion_instance_type    = "t3.micro"
+
+# SSH Access
+# Replace with your SSH public key
+ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC... your-key"
+
+# Restrict SSH access to your IP only
+allowed_ssh_cidrs = ["YOUR_IP/32"]
+
+# Storage
+ledger_volume_size       = 500
+ledger_volume_type       = "gp3"
+ledger_volume_iops       = 3000
+ledger_volume_throughput = 125
+
+# XRPL Configuration
+network_type    = "testnet"
+validator_count = 1
+unl_url         = "https://vl.xrplf.org"
+
+# Monitoring
+enable_monitoring      = true
+grafana_admin_password = "changeme-use-strong-password!"
+alert_email            = "alerts@yourdomain.com"
+
+# Additional Tags
+additional_tags = {
+  Owner       = "DevOps"
+  CostCenter  = "Infrastructure"
+  Application = "XRPL-Validator"
+}

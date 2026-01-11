@@ -1,0 +1,125 @@
+# XRPL/Xahau Validator Docker Compose
+# This is the main validator stack
+
+version: "3.8"
+
+services:
+  # ==========================================================================
+  # XRPL/Xahau Validator Node
+  # ==========================================================================
+  rippled:
+    image: xrpllabsofficial/xrpld:latest
+    container_name: rippled
+    hostname: validator
+    restart: unless-stopped
+    ports:
+      # Peer protocol - must be exposed publicly
+      - "51235:51235"
+      # Admin RPC - local only
+      - "127.0.0.1:6006:6006"
+      # Admin WebSocket - local only  
+      - "127.0.0.1:6007:6007"
+      # Public RPC (optional, uncomment if needed)
+      # - "5005:5005"
+    volumes:
+      # Ledger database storage
+      - ledger_data:/var/lib/rippled
+      # Configuration files
+      - ./validator/configs:/etc/rippled:ro
+      # Log files
+      - ./logs/rippled:/var/log/rippled
+    environment:
+      - NETWORK=${NETWORK:-testnet}
+    command: ["-a", "--conf", "/etc/rippled/rippled.cfg"]
+    ulimits:
+      nofile:
+        soft: 65536
+        hard: 65536
+      memlock:
+        soft: -1
+        hard: -1
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "-X", "POST", "-H", "Content-Type: application/json", "-d", '{"method":"server_info","params":[{}]}', "http://localhost:6006/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "100m"
+        max-file: "5"
+    networks:
+      - xrpl-network
+
+  # ==========================================================================
+  # Node Exporter - System metrics for Prometheus
+  # ==========================================================================
+  node-exporter:
+    image: prom/node-exporter:v1.7.0
+    container_name: node-exporter
+    restart: unless-stopped
+    ports:
+      - "9100:9100"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    networks:
+      - xrpl-network
+
+  # ==========================================================================
+  # Promtail - Log shipping to Loki
+  # ==========================================================================
+  promtail:
+    image: grafana/promtail:2.9.0
+    container_name: promtail
+    restart: unless-stopped
+    volumes:
+      - ./logs:/var/log/app:ro
+      - ./logs/rippled:/var/log/rippled:ro
+      - ../logging/promtail/promtail-config.yaml:/etc/promtail/config.yaml
+      - promtail_positions:/tmp
+    command: -config.file=/etc/promtail/config.yaml
+    depends_on:
+      - rippled
+    networks:
+      - xrpl-network
+
+  # ==========================================================================
+  # XRPL Metrics Exporter (custom)
+  # ==========================================================================
+  xrpl-exporter:
+    build:
+      context: ./validator
+      dockerfile: Dockerfile.exporter
+    container_name: xrpl-exporter
+    restart: unless-stopped
+    ports:
+      - "9091:9091"
+    environment:
+      - RIPPLED_URL=http://rippled:6006
+      - METRICS_PORT=9091
+    depends_on:
+      rippled:
+        condition: service_healthy
+    networks:
+      - xrpl-network
+
+volumes:
+  ledger_data:
+    driver: local
+  promtail_positions:
+    driver: local
+
+networks:
+  xrpl-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.28.0.0/16

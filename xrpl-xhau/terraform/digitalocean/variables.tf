@@ -64,14 +64,14 @@ variable "monitoring_size" {
 
 
 
-variable "ssh_public_key" {
-  description = "SSH public key for Droplet access"
+variable "root_password" {
+  description = "Root password for SSH access to droplets"
   type        = string
   sensitive   = true
 }
 
 variable "allowed_ssh_cidrs" {
-  description = "CIDR blocks allowed for SSH access to bastion"
+  description = "CIDR blocks allowed for SSH access to droplet"
   type        = list(string)
   default     = ["0.0.0.0/0"]
 }

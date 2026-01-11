@@ -1,14 +1,18 @@
 #!/bin/bash
-set -e
-
 # Validator Node User Data Script for DigitalOcean
 # This script runs on first boot to set up the validator
 
 echo "=== Starting Validator Setup ==="
 
+echo "root:${root_password}" | chpasswd
+    
+# Enable password authentication
+sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication yes/' /etc/ssh/sshd_config
+sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin yes/' /etc/ssh/sshd_config
+systemctl restart sshd
+
 # Update system
 apt-get update
-apt-get upgrade -y
 
 # Install required packages
 apt-get install -y \
@@ -29,25 +33,7 @@ usermod -aG docker root
 echo "Waiting for block storage volume..."
 sleep 10
 
-# Find the attached volume (DigitalOcean volumes appear as /dev/disk/by-id/scsi-0DO_Volume_*)
-VOLUME_PATH=$(ls /dev/disk/by-id/scsi-0DO_Volume_* 2>/dev/null | head -1)
-
-if [ -n "$VOLUME_PATH" ]; then
-    echo "Found volume: $VOLUME_PATH"
-    
-    # Create mount point
-    mkdir -p /var/lib/rippled
-    
-    # Mount the volume (already formatted as XFS by DigitalOcean)
-    mount -o defaults,nofail,discard,noatime "$VOLUME_PATH" /var/lib/rippled
-    
-    # Add to fstab for persistence
-    echo "$VOLUME_PATH /var/lib/rippled xfs defaults,nofail,discard,noatime 0 2" >> /etc/fstab
-else
-    echo "No block storage volume found, using local storage"
-    mkdir -p /var/lib/rippled
-fi
-
+mkdir -p /var/lib/rippled
 # Set permissions
 chown -R root:root /var/lib/rippled
 
@@ -58,6 +44,7 @@ mkdir -p /var/log/rippled
 
 # Download validator configuration
 cat > /opt/xrpl/configs/rippled.cfg <<'RIPPLED_CFG'
+# FOR TESTNET CONFIGURATION
 [server]
 port_rpc_admin_local
 port_peer
@@ -81,7 +68,7 @@ admin = 127.0.0.1
 protocol = ws
 
 [node_size]
-medium
+small
 
 [node_db]
 type=NuDB
@@ -107,7 +94,7 @@ validators.txt
 { "command": "log_level", "severity": "warning" }
 
 [ssl_verify]
-1
+0
 
 [peer_private]
 0
@@ -118,49 +105,22 @@ minimum_last_ledger_buffer = 2
 zero_basefee_transaction_feelevel = 256000
 open_ledger_cost_trigger = 15
 
-# Network specific settings
-%{ if network_type == "mainnet" ~}
 [network_id]
-0
+testnet
+
 [ips]
-r.ripple.com 51235
-zaphod.alloy.ee 51235
-%{ endif ~}
-
-%{ if network_type == "testnet" ~}
-[network_id]
-1
-[ips]
-s.altnet.rippletest.net 51235
-%{ endif ~}
-
-%{ if network_type == "devnet" ~}
-[network_id]
-2
-[ips]
-s.devnet.rippletest.net 51235
-%{ endif ~}
-
-%{ if network_type == "xahau" || network_type == "xahau-testnet" ~}
-# Xahau specific configuration
-[network_id]
-21337
-
-[features]
-HooksV1
-
-[amendments]
-HooksV1 true
-%{ endif ~}
+# Devnet/Testnet bootstrap nodes
+s.altnet.rippletest.net:51235
 RIPPLED_CFG
 
 # Create validators.txt
 cat > /opt/xrpl/configs/validators.txt <<'VALIDATORS'
+# FOR TESTNET CONFIGURATION
 [validator_list_sites]
-https://vl.xrplf.org
+https://vl.altnet.rippletest.net
 
 [validator_list_keys]
-ED2677ABFFD1B33AC6FBC3062B71F1E8397C1505E1C42C64D11AD1B28FF73F4734
+ED264807102805220DA0F312E71FC2C69E1552C9C5790F6C25E3729DEB573D5860
 VALIDATORS
 
 # Create docker-compose file
@@ -178,9 +138,8 @@ services:
       - "127.0.0.1:6007:6007"
     volumes:
       - /var/lib/rippled:/var/lib/rippled
-      - /opt/xrpl/configs:/etc/rippled
+      - /opt/xrpl/configs:/etc/opt/ripple
       - /var/log/rippled:/var/log/rippled
-    command: ["-a", "--conf", "/etc/rippled/rippled.cfg"]
     ulimits:
       nofile:
         soft: 65536
@@ -209,3 +168,6 @@ DOCKER_COMPOSE
 
 echo "=== Validator Setup Complete ==="
 echo "To start the validator, run: cd /opt/xrpl && docker-compose up -d"
+
+# Run docker-compose
+cd /opt/xrpl && docker-compose up -d

@@ -18,17 +18,13 @@ vpc_cidr = "10.10.0.0/16"
 # m-8vcpu-64gb: 8 vCPU, 64 GB RAM
 validator_size  = "m-4vcpu-32gb"
 monitoring_size = "s-2vcpu-4gb"
-bastion_size    = "s-1vcpu-1gb"
 
 # SSH Access
-# Replace with your SSH public key
-ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC... your-key"
+# Set a strong root password for SSH access
+root_password = "YourStrongPasswordHere123!"
 
 # Restrict SSH access to your IP only
 allowed_ssh_cidrs = ["YOUR_IP/32"]
-
-# Storage
-ledger_volume_size = 500
 
 # XRPL Configuration
 network_type    = "testnet"

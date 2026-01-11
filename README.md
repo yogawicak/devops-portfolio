@@ -37,12 +37,6 @@ Coming soon - Percona database deployment configurations.
 - **Monitoring**: Prometheus, Grafana, Loki
 - **Blockchain**: XRPL (rippled), Xahau (xahaud)
 
-## 🤝 About
-
-**Yoga Wicaksono** - DevOps Engineer
-
-This portfolio demonstrates practical experience in designing and implementing production-grade infrastructure, automation, and monitoring systems.
-
 ## 📄 License
 
 MIT License - See individual project LICENSE files for details.

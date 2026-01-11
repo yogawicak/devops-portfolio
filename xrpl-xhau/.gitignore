@@ -6,6 +6,10 @@ production.tfvars
 .terraform/
 .terraform.lock.hcl
 
+# Terraform
+.terraform.tfstate
+.terraform.tfstate.lock.info
+
 # Sensitive files / secrets
 *.pem
 *.key

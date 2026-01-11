@@ -66,7 +66,6 @@ terraform apply -var-file="production.tfvars" -var="do_token=$DIGITALOCEAN_TOKEN
 | -------------- | ----------------- | -------------------- |
 | Validator      | EC2 r5.large      | Droplet m-4vcpu-32gb |
 | Monitoring     | EC2 t3.medium     | Droplet s-2vcpu-4gb  |
-| Bastion        | EC2 t3.micro      | Droplet s-1vcpu-1gb  |
 | Ledger Storage | EBS gp3 500GB     | Block Storage 500GB  |
 | Firewall       | Security Groups   | Cloud Firewalls      |
 | Network        | VPC + NAT Gateway | VPC                  |

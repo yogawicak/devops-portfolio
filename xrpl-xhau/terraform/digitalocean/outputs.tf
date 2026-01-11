@@ -31,39 +31,6 @@ output "validator_droplet_ids" {
   value       = digitalocean_droplet.validator[*].id
 }
 
-output "monitoring_public_ip" {
-  description = "Public IP of monitoring droplet"
-  value       = var.enable_monitoring ? digitalocean_droplet.monitoring[0].ipv4_address : null
-}
-
-output "monitoring_private_ip" {
-  description = "Private IP of monitoring droplet"
-  value       = var.enable_monitoring ? digitalocean_droplet.monitoring[0].ipv4_address_private : null
-}
-
-# ============================================================================
-# Volume Outputs
-# ============================================================================
-
-output "ledger_volume_ids" {
-  description = "IDs of ledger volumes"
-  value       = digitalocean_volume.ledger[*].id
-}
-
-# ============================================================================
-# SSH Connection Commands
-# ============================================================================
-
-output "ssh_validator_command" {
-  description = "SSH command to connect directly to validator"
-  value       = "ssh -i ~/.ssh/id_rsa root@${digitalocean_droplet.validator[0].ipv4_address}"
-}
-
-output "ssh_monitoring_command" {
-  description = "SSH command to connect directly to monitoring"
-  value       = var.enable_monitoring ? "ssh -i ~/.ssh/id_rsa root@${digitalocean_droplet.monitoring[0].ipv4_address}" : "Monitoring disabled"
-}
-
 # Project Output
 # ============================================================================
 

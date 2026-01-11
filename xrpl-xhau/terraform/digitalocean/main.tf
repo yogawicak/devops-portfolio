@@ -25,11 +25,9 @@ provider "digitalocean" {
   token = var.do_token
 }
 
-# SSH Key
-resource "digitalocean_ssh_key" "validator" {
-  name       = "${var.project_name}-${var.environment}-key"
-  public_key = var.ssh_public_key
-}
+# Password Authentication
+# Using root password authentication instead of SSH keys
+# Password will be set via user_data script during droplet creation
 
 # Project for organization
 resource "digitalocean_project" "validator" {
@@ -38,10 +36,7 @@ resource "digitalocean_project" "validator" {
   purpose     = "Service or API"
   environment = var.environment == "production" ? "Production" : "Development"
 
-  resources = concat(
-    [for droplet in digitalocean_droplet.validator : droplet.urn],
-    var.enable_monitoring ? [digitalocean_droplet.monitoring[0].urn] : []
-  )
+  resources = [for droplet in digitalocean_droplet.validator : droplet.urn]
 }
 
 # ============================================================================

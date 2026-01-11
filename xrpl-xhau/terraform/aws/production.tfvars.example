@@ -19,7 +19,6 @@ bastion_instance_type    = "t3.micro"
 
 # SSH Access
 # Replace with your SSH public key
-ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQC... your-key"
 
 # Restrict SSH access to your IP only
 allowed_ssh_cidrs = ["YOUR_IP/32"]
